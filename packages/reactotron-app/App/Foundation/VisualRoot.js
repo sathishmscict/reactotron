@@ -9,6 +9,7 @@ import StateWatchDialog from '../Dialogs/StateWatchDialog'
 import FilterTimelineDialog from '../Dialogs/FilterTimelineDialog'
 import Subscriptions from './Subscriptions'
 import Backups from './Backups'
+import Sagas from './Sagas'
 import Native from './Native'
 import Sidebar from './Sidebar'
 import Help from './Help'
@@ -55,6 +56,7 @@ export default class VisualRoot extends Component {
     const showHelp = ui.tab === 'help'
     const showSettings = ui.tab === 'settings'
     const showBackups = ui.tab === 'backups'
+    const showSagas = ui.tab === 'sagas'
     const showNative = ui.tab === 'native'
 
     return (
@@ -71,6 +73,9 @@ export default class VisualRoot extends Component {
               </div>
               <div style={showBackups ? Styles.page : Styles.pageHidden}>
                 <Backups />
+              </div>
+              <div style={showSagas ? Styles.page : Styles.pageHidden}>
+                <Sagas />
               </div>
               <div style={showHelp ? Styles.page : Styles.pageHidden}>
                 <Help />

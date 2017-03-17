@@ -63,7 +63,8 @@ class UI {
     Mousetrap.bind(`${Keystroke.mousetrap}+1`, this.switchTab.bind(this, 'timeline'))
     Mousetrap.bind(`${Keystroke.mousetrap}+2`, this.switchTab.bind(this, 'subscriptions'))
     Mousetrap.bind(`${Keystroke.mousetrap}+3`, this.switchTab.bind(this, 'backups'))
-    Mousetrap.bind(`${Keystroke.mousetrap}+4`, this.switchTab.bind(this, 'native'))
+    Mousetrap.bind(`${Keystroke.mousetrap}+4`, this.switchTab.bind(this, 'sagas'))
+    Mousetrap.bind(`${Keystroke.mousetrap}+5`, this.switchTab.bind(this, 'native'))
     Mousetrap.bind(`${Keystroke.mousetrap}+/`, this.switchTab.bind(this, 'help'))
     Mousetrap.bind(`${Keystroke.mousetrap}+?`, this.switchTab.bind(this, 'help'))
   }

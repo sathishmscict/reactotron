@@ -1,7 +1,7 @@
 import UiStore from './UiStore'
 import { createServer } from 'reactotron-core-server'
 import { action, observable, computed, reaction } from 'mobx'
-import { contains, last, isNil, reject, equals, reverse, pipe, propEq, map, fromPairs } from 'ramda'
+import { values, contains, last, isNil, reject, equals, reverse, pipe, propEq, map, fromPairs } from 'ramda'
 import { dotPath } from 'ramdasauce'
 import shallowDiff from '../Lib/ShallowDiff'
 
@@ -58,6 +58,15 @@ class Session {
     return this.server.commands['state.backup.response'].toJS().reverse()
   }
 
+  @computed get sagaEffectTree () {
+    return this.server.latestSagaTree
+    // const tree = last(this.server.commands['saga.effect.update'].toJS())
+    // if (!tree) return null
+    // const payload = tree.payload
+
+    // return payload
+  }
+
   // are commands of this type hidden?
   isCommandHidden (commandType) {
     return contains(commandType, this.commandsHiddenInTimeline)
@@ -75,7 +84,12 @@ class Session {
   }
 
   constructor (port = 9090) {
-    this.server = createServer({ port })
+    this.server = createServer({
+      port,
+      onCommand: command => {
+        // console.log(command)
+      }
+    })
     this.server.start()
     this.isSubscriptionValuesSameAsLastTime = this.isSubscriptionValuesSameAsLastTime.bind(this)
 

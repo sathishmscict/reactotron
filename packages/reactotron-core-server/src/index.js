@@ -1,7 +1,7 @@
 import { merge, length, find, propEq, without, contains, forEach, pluck, reject } from 'ramda'
 import Commands from './commands'
 import validate from './validation'
-import { observable, computed, asFlat } from 'mobx'
+import { observable, computed, asFlat, asMap } from 'mobx'
 import socketIO from 'socket.io'
 
 const DEFAULTS = {
@@ -27,6 +27,15 @@ class Server {
    * Holds the commands the client has sent.
    */
   commands = new Commands()
+
+  /**
+   * Holds a list of commands that we only need the latest one.
+   */
+  @observable latestSagaTree = asFlat([])
+  @observable latestCommand = asMap({})
+  latestOnlyCommands = [
+    'saga.effect.update'
+  ]
 
   /**
    * Holds the currently connected clients.
@@ -129,9 +138,15 @@ class Server {
 
         // clear
         if (type === 'clear') {
+          this.latestCommand.clear()
           this.commands.all.clear()
         } else {
-          this.commands.addCommand(fullCommand)
+          if (type === 'saga.effect.update') {
+            this.latestSagaTree.clear()
+            this.latestSagaTree.push(...(fullCommand.payload))
+          } else {
+            this.commands.addCommand(fullCommand)
+          }
           onCommand(fullCommand)
         }
       })

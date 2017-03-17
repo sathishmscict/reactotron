@@ -2,12 +2,14 @@ import { is } from 'redux-saga/utils'
 import getEffectName from './get-effect-name'
 import getEffectDescription from './get-effect-description'
 import { ITERATOR, CALL, PUT, FORK, RACE, PENDING, RESOLVED, REJECTED, CANCELLED } from './saga-constants'
-import { reject, values, pluck, isNil, split, pathOr, last, forEach, propEq, filter, __, omit, map } from 'ramda'
+import { pick, reject, values, pluck, isNil, split, pathOr, last, forEach, propEq, filter, __, omit, map } from 'ramda'
 
 // creates a saga monitor
 export default (reactotron, options) => {
   // a lookup table of effects - keys are numbers, values are objects
   let effects = {}
+  // effects that have finished but we can't kill right away until the task completes
+  let killList = []
 
   // filtering that effect table
   const byParentId = propEq('parentEffectId', __)
@@ -19,7 +21,11 @@ export default (reactotron, options) => {
   const timer = reactotron.startTimer()
 
   // ---------------- Sending Effect Updates ----------------
-  const sendReactotronEffectTree = () => reactotron.send('saga.effect.update', effects)
+  const fieldsToSend = ['effectId', 'parentEffectId', 'name', 'description', 'status']
+  const sendReactotronEffectTree = () => {
+    const payload = values(map(pick(fieldsToSend), effects))
+    reactotron.send('saga.effect.update', payload)
+  }
 
   // ---------------- Starting -----------------------------
 
@@ -145,7 +151,16 @@ export default (reactotron, options) => {
       children
     })
 
+    // clear children
     effects = omit(map(String, pluck('effectId', children)), effects)
+
+    // clear any lingering effects that have been delayed their execution
+    effects = omit(map(String, killList), effects)
+
+    // reset the kill list
+    killList = []
+
+    sendReactotronEffectTree()
   }
 
   // redux-saga calls this when an effect is resolved (successfully or not)
@@ -154,6 +169,8 @@ export default (reactotron, options) => {
     const effectInfo = effects[effectId]
     updateDuration(effectInfo)
     effectInfo.result = result
+    const { parentEffectId } = effectInfo
+    const parentEffectInfo = effects[parentEffectId]
 
     // this is a task
     if (is.task(result)) {
@@ -185,10 +202,13 @@ export default (reactotron, options) => {
       if (effectInfo.name === RACE) {
         setRaceWinner(effectId, result)
       }
+      // if this effect belongs to an iterator, then it shall be marked for death
+      if (parentEffectInfo && parentEffectInfo.name === ITERATOR) {
+        killList.push(effectId)
+        sendReactotronEffectTree()
+      }
     }
 
-    // send it
-    sendReactotronEffectTree()
   }
 
   // flags on of the children as the winner

@@ -19,10 +19,14 @@ const api = ApiSauce.create({
 // api.addMonitor(console.tron.apisauce)
 
 export default function * rootSaga () {
-  yield [
-    takeEvery(Startup.Types.Startup, startup),
-    takeLatest(Repo.Types.Request, requestRepo, api),
-    takeEvery(Error.Types.Saga, sagaError),
-    takeEvery(Error.Types.Put, putError)
-  ]
+  // yield [
+  //   takeEvery(Startup.Types.Startup, startup),
+  //   takeLatest(Repo.Types.Request, requestRepo, api),
+  //   takeEvery(Error.Types.Saga, sagaError),
+  //   takeEvery(Error.Types.Put, putError)
+  // ]
+  yield takeEvery(Startup.Types.Startup, startup)
+  yield takeLatest(Repo.Types.Request, requestRepo, api)
+  yield takeEvery(Error.Types.Saga, sagaError)
+  yield takeEvery(Error.Types.Put, putError)
 }
