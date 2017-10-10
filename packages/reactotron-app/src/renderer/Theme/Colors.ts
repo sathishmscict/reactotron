@@ -31,7 +31,7 @@ const getStylingFromBase16 = base16Theme => ({
     chrome: Color(base16Theme.base00).lighten(0.1).hsl().string(),
     chromeLine: Color(base16Theme.base00).lighten(0.25).hsl().string()
   },
-  theme: base16Theme // TODO: figure out why I'm doing this?
+  theme: base16Theme, // TODO: figure out why I'm doing this?
 })
 
 // the default theme until i figure out how to customize it on the fly
@@ -61,5 +61,5 @@ const theme = styling('theme').style
 export default {
   ...roles,
   theme,
-  invertTheme
+  invertTheme,
 }
