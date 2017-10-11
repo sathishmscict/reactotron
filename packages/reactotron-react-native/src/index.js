@@ -6,7 +6,7 @@ import networking from './plugins/networking'
 import { createClient } from 'reactotron-core-client'
 import getHost from 'rn-host-detect'
 
-var io = require('socket.io-client/dist/socket.io')
+var io = require('socket.io-client')
 
 export { trackGlobalErrors, openInEditor, overlay, asyncStorage, networking }
 // ---------------------
